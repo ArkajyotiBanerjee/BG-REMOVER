@@ -6,6 +6,11 @@ from api.bg_remover import remove_background
 
 app = FastAPI(title="Background Remover API")
 
+from fastapi.staticfiles import StaticFiles
+
+app.mount("/", StaticFiles(directory=".", html=True), name="static")
+
+
 # -------------------------
 # Health check
 # -------------------------
