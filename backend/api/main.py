@@ -7,20 +7,6 @@ from api.bg_remover import remove_background
 app = FastAPI(title="Background Remover API")
 
 # -------------------------
-# Startup: preload ML model
-# -------------------------
-@app.on_event("startup")
-def preload_model():
-    print("⏳ Preloading background removal model...")
-    try:
-        # Dummy PNG header to trigger model load
-        remove_background(b"\x89PNG\r\n\x1a\n")
-    except Exception:
-        # rembg throws on invalid input; ignore
-        pass
-    print("✅ Model loaded and ready")
-
-# -------------------------
 # Health check
 # -------------------------
 @app.get("/health")
@@ -40,7 +26,7 @@ async def remove_bg(file: UploadFile = File(...)):
     try:
         output_bytes = await asyncio.wait_for(
             asyncio.to_thread(remove_background, image_bytes),
-            timeout=30  # seconds
+            timeout=120  # give ML enough time
         )
     except asyncio.TimeoutError:
         raise HTTPException(status_code=504, detail="Image processing timeout")
